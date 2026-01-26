@@ -55,10 +55,6 @@ enum Token {
     Identifier(String),
 }
 
-// const keywords = HashMap::from([
-//     ("and", KeywordAnd)
-// ])
-
 struct Scanner {
     source: String,
 
@@ -171,10 +167,8 @@ impl Scanner {
                     Err(ScanError {
                         line: self.line,
                         message: format!(
-                            "Unterminated string literal between columns {}-{}: \"{}.",
-                            self.lex_start_pos,
-                            self.lex_curr_pos,
-                            str::from_utf8(&literal).unwrap()
+                            "Unterminated string literal \"{}",
+                            String::from_utf8(literal).unwrap()
                         ),
                     })
                 } else {
@@ -208,11 +202,11 @@ impl Scanner {
                 LiteralNumber(String::from_utf8(literal).unwrap().parse::<f64>().unwrap())
             }),
 
-            _ if (char::from(c).is_ascii_alphanumeric() || c == b'_') => Ok({
+            c if (c.is_ascii_alphanumeric() || c == b'_') => Ok({
                 let mut identifier = vec![c];
                 while self.can_scan() {
                     let nc = self.peek_char();
-                    if !char::from(nc).is_ascii_alphanumeric() && nc != b'_' {
+                    if !nc.is_ascii_alphanumeric() && nc != b'_' {
                         break;
                     }
 
@@ -243,7 +237,7 @@ impl Scanner {
             }),
             _ => Err(ScanError {
                 line: self.line,
-                message: format!("Unexpected character '{}'.", char::from(c)),
+                message: format!("Unexpected character '{}'", char::from(c)),
             }),
         }
     }
@@ -269,7 +263,10 @@ impl Scanner {
         if !errors.is_empty() {
             Err(errors)
         } else {
-            Ok(tokens)
+            Ok(tokens
+                .into_iter()
+                .filter(|x| *x != Token::Whitespace)
+                .collect())
         }
     }
 }
