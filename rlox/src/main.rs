@@ -32,6 +32,8 @@ enum Token {
     Slash,
     SlashSlash,
     Whitespace,
+    StringLiteral(String),
+    NumberLiteral(f64),
 }
 
 struct Scanner {
@@ -127,6 +129,43 @@ impl Scanner {
                 self.line += 1;
                 Whitespace
             }),
+
+            // string literals
+            b'"' => Ok({
+                let mut literal = Vec::<u8>::new();
+                while self.can_scan() {
+                    let nc = self.next_char();
+                    if nc == b'"' {
+                        break;
+                    }
+                    literal.push(nc);
+                }
+
+                StringLiteral(String::from_utf8(literal).unwrap())
+            }),
+
+            // number literals
+            b'0'..=b'9' => Ok({
+                let mut literal = vec![c];
+                let mut seen_dot = false;
+                while self.can_scan() {
+                    let nc = self.next_char();
+                    if nc == b'.' {
+                        if seen_dot {
+                            break;
+                        }
+                        seen_dot = true;
+                    }
+
+                    if !(b'0'..=b'9').contains(&nc) {
+                        break;
+                    }
+
+                    literal.push(nc);
+                }
+
+                NumberLiteral(String::from_utf8(literal).unwrap().parse::<f64>().unwrap())
+            }),
             _ => Err(ScanError {
                 line: self.line,
                 message: format!("Unexpected character '{}'.", char::from(c)),
@@ -143,11 +182,11 @@ impl Scanner {
             match self.scan_token() {
                 Ok(token) => {
                     tokens.push(token);
-                    
+
                     if !self.can_scan() {
                         tokens.push(Token::Eof);
                     }
-                },
+                }
                 Err(error) => errors.push(error),
             }
         }
