@@ -32,8 +32,11 @@ enum Token {
     Slash,
     SlashSlash,
     Whitespace,
-    StringLiteral(String),
-    NumberLiteral(f64),
+
+    LiteralString(String),
+    LiteralNumber(f64),
+
+    Identifier(String),
 }
 
 struct Scanner {
@@ -117,10 +120,9 @@ impl Scanner {
                 if !self.can_scan() || self.peek_char() != b'/' {
                     Slash
                 } else {
-                    // TODO: is this ok?
-                    // consumes the trailing newline due to `next_char` semantics
-                    // so you will not a final Token::Whitespace in the token list
-                    while self.can_scan() && self.next_char() != b'\n' {}
+                    while self.can_scan() && self.peek_char() != b'\n' {
+                        let _ = self.next_char();
+                    }
                     SlashSlash
                 }
             }),
@@ -141,7 +143,7 @@ impl Scanner {
                     literal.push(nc);
                 }
 
-                StringLiteral(String::from_utf8(literal).unwrap())
+                LiteralString(String::from_utf8(literal).unwrap())
             }),
 
             // number literals
@@ -149,7 +151,12 @@ impl Scanner {
                 let mut literal = vec![c];
                 let mut seen_dot = false;
                 while self.can_scan() {
-                    let nc = self.next_char();
+                    let nc = self.peek_char();
+
+                    if !nc.is_ascii_digit() && nc != b'.' {
+                        break;
+                    }
+
                     if nc == b'.' {
                         if seen_dot {
                             break;
@@ -157,14 +164,25 @@ impl Scanner {
                         seen_dot = true;
                     }
 
-                    if !(b'0'..=b'9').contains(&nc) {
-                        break;
-                    }
-
+                    let _ = self.next_char();
                     literal.push(nc);
                 }
 
-                NumberLiteral(String::from_utf8(literal).unwrap().parse::<f64>().unwrap())
+                LiteralNumber(String::from_utf8(literal).unwrap().parse::<f64>().unwrap())
+            }),
+
+            c if (char::from(c).is_ascii_alphanumeric() || c == b'_') => Ok({
+                let mut identifier = vec![c];
+                while self.can_scan() {
+                    let nc = self.peek_char();
+                    if !char::from(nc).is_ascii_alphanumeric() && nc != b'_' {
+                        break;
+                    }
+
+                    let _ = self.next_char();
+                    identifier.push(nc);
+                }
+                Identifier(String::from_utf8(identifier).unwrap())
             }),
             _ => Err(ScanError {
                 line: self.line,
