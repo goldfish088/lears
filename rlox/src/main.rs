@@ -36,8 +36,28 @@ enum Token {
     LiteralString(String),
     LiteralNumber(f64),
 
+    KeywordAnd,
+    KeywordClass,
+    KeywordElse,
+    KeywordFalse,
+    KeywordFun,
+    KeywordFor,
+    KeywordIf,
+    KeywordNil,
+    KeywordOr,
+    KeywordPrint,
+    KeywordReturn,
+    KeywordSuper,
+    KeywordThis,
+    KeywordTrue,
+    KeywordVar,
+    KeywordWhile,
     Identifier(String),
 }
+
+// const keywords = HashMap::from([
+//     ("and", KeywordAnd)
+// ])
 
 struct Scanner {
     source: String,
@@ -133,6 +153,7 @@ impl Scanner {
             }),
 
             // string literals
+            // TODO: unterminated string literal issue
             b'"' => Ok({
                 let mut literal = Vec::<u8>::new();
                 while self.can_scan() {
@@ -171,7 +192,7 @@ impl Scanner {
                 LiteralNumber(String::from_utf8(literal).unwrap().parse::<f64>().unwrap())
             }),
 
-            c if (char::from(c).is_ascii_alphanumeric() || c == b'_') => Ok({
+            _ if (char::from(c).is_ascii_alphanumeric() || c == b'_') => Ok({
                 let mut identifier = vec![c];
                 while self.can_scan() {
                     let nc = self.peek_char();
@@ -182,7 +203,27 @@ impl Scanner {
                     let _ = self.next_char();
                     identifier.push(nc);
                 }
-                Identifier(String::from_utf8(identifier).unwrap())
+
+                let raw_identifier = String::from_utf8(identifier).unwrap();
+                match raw_identifier.as_str() {
+                    "and" => KeywordAnd,
+                    "class" => KeywordClass,
+                    "else" => KeywordElse,
+                    "false" => KeywordFalse,
+                    "fun" => KeywordFun,
+                    "for" => KeywordFor,
+                    "if" => KeywordIf,
+                    "nil" => KeywordNil,
+                    "or" => KeywordOr,
+                    "print" => KeywordPrint,
+                    "return" => KeywordReturn,
+                    "super" => KeywordSuper,
+                    "this" => KeywordThis,
+                    "true" => KeywordTrue,
+                    "var" => KeywordVar,
+                    "while" => KeywordWhile,
+                    _ => Identifier(raw_identifier),
+                }
             }),
             _ => Err(ScanError {
                 line: self.line,
