@@ -21,6 +21,17 @@ enum Token {
     Semicolon,
     Plus,
     Star,
+    Bang,
+    BangEqual,
+    Equal,
+    EqualEqual,
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
+    Slash,
+    SlashSlash,
+    Whitespace,
 }
 
 struct Scanner {
@@ -47,42 +58,78 @@ impl Scanner {
         self.lex_curr_pos < self.source.len()
     }
 
-    fn next_char(&mut self) -> char {
+    fn peek_char(&self) -> u8 {
+        assert!(self.can_scan());
+        self.source.as_bytes()[self.lex_curr_pos]
+    }
+
+    fn next_char(&mut self) -> u8 {
         assert!(self.can_scan());
 
-        let c = self
-            .source
-            .chars()
-            .nth(self.lex_curr_pos)
-            .unwrap_or_else(|| {
-                eprintln!("could not get char at pos {}", self.lex_curr_pos);
-                process::exit(65);
-            });
-
+        let c = self.source.as_bytes()[self.lex_curr_pos];
         self.lex_curr_pos += 1;
         c
     }
 
-    fn scan_token(&mut self) -> Result<Token, ScanError> {
+    fn lookahead_one(&mut self, val: u8, eq: Token, fallback: Token) -> Token {
         if !self.can_scan() {
-            return Ok(Token::Eof);
+            return fallback;
         }
 
+        let c = self.source.as_bytes()[self.lex_curr_pos];
+        if c == val {
+            self.lex_curr_pos += 1;
+            eq
+        } else {
+            fallback
+        }
+    }
+
+    fn scan_token(&mut self) -> Result<Token, ScanError> {
+        use Token::*;
+        assert!(self.can_scan());
+
         let c = self.next_char();
+        // TODO: implement an alternative matcher using a trie, keep this implementation
+        // put all these methods under a trait, and this current approach can be one
+        // such trait implementation.
         match c {
-            '(' => Ok(Token::LParen),
-            ')' => Ok(Token::RParen),
-            '{' => Ok(Token::LBrace),
-            '}' => Ok(Token::RBrace),
-            ',' => Ok(Token::Comma),
-            '.' => Ok(Token::Dot),
-            '-' => Ok(Token::Minus),
-            '+' => Ok(Token::Plus),
-            ';' => Ok(Token::Semicolon),
-            '*' => Ok(Token::Star),
+            // single char tokens
+            b'(' => Ok(LParen),
+            b')' => Ok(RParen),
+            b'{' => Ok(LBrace),
+            b'}' => Ok(RBrace),
+            b',' => Ok(Comma),
+            b'.' => Ok(Dot),
+            b'-' => Ok(Minus),
+            b'+' => Ok(Plus),
+            b';' => Ok(Semicolon),
+            b'*' => Ok(Star),
+
+            // op tokens
+            b'!' => Ok(self.lookahead_one(b'=', BangEqual, Bang)),
+            b'=' => Ok(self.lookahead_one(b'=', EqualEqual, Equal)),
+            b'<' => Ok(self.lookahead_one(b'=', LessEqual, Less)),
+            b'>' => Ok(self.lookahead_one(b'=', GreaterEqual, Greater)),
+            b'/' => Ok({
+                if !self.can_scan() || self.peek_char() != b'/' {
+                    Slash
+                } else {
+                    // TODO: is this ok?
+                    // consumes the trailing newline due to `next_char` semantics
+                    // so you will not a final Token::Whitespace in the token list
+                    while self.can_scan() && self.next_char() != b'\n' {}
+                    SlashSlash
+                }
+            }),
+            b' ' | b'\t' | b'\r' => Ok(Whitespace),
+            b'\n' => Ok({
+                self.line += 1;
+                Whitespace
+            }),
             _ => Err(ScanError {
                 line: self.line,
-                message: format!("Unexpected character '{}'.", c),
+                message: format!("Unexpected character '{}'.", char::from(c)),
             }),
         }
     }
@@ -91,15 +138,16 @@ impl Scanner {
         let mut tokens = Vec::<Token>::new();
         let mut errors = Vec::<ScanError>::new();
 
-        loop {
+        while self.can_scan() {
             self.lex_start_pos = self.lex_curr_pos;
             match self.scan_token() {
                 Ok(token) => {
                     tokens.push(token);
-                    if *tokens.last().unwrap() == Token::Eof {
-                        break;
+                    
+                    if !self.can_scan() {
+                        tokens.push(Token::Eof);
                     }
-                }
+                },
                 Err(error) => errors.push(error),
             }
         }
@@ -159,7 +207,7 @@ fn run_repl() {
             break;
         }
 
-        let _ = line.pop();
+        // let _ = line.pop();
         interpret(line);
     }
 }
