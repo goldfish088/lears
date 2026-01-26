@@ -10,17 +10,17 @@ fn print_type<T>(_: &T) {
 
 #[derive(Debug, PartialEq)]
 enum Token {
-    LPAREN,
-    RPAREN,
-    LBRACE,
-    RBRACE,
-    COMMA,
-    EOF,
-    DOT,
-    MINUS,
-    SEMICOLON,
-    PLUS,
-    STAR,
+    LParen,
+    RParen,
+    LBrace,
+    RBrace,
+    Comma,
+    Eof,
+    Dot,
+    Minus,
+    Semicolon,
+    Plus,
+    Star,
 }
 
 struct Scanner {
@@ -65,21 +65,21 @@ impl Scanner {
 
     fn scan_token(&mut self) -> Result<Token, ScanError> {
         if !self.can_scan() {
-            return Ok(Token::EOF);
+            return Ok(Token::Eof);
         }
 
         let c = self.next_char();
         match c {
-            '(' => Ok(Token::LPAREN),
-            ')' => Ok(Token::RPAREN),
-            '{' => Ok(Token::LBRACE),
-            '}' => Ok(Token::RBRACE),
-            ',' => Ok(Token::COMMA),
-            '.' => Ok(Token::DOT),
-            '-' => Ok(Token::MINUS),
-            '+' => Ok(Token::PLUS),
-            ';' => Ok(Token::SEMICOLON),
-            '*' => Ok(Token::STAR),
+            '(' => Ok(Token::LParen),
+            ')' => Ok(Token::RParen),
+            '{' => Ok(Token::LBrace),
+            '}' => Ok(Token::RBrace),
+            ',' => Ok(Token::Comma),
+            '.' => Ok(Token::Dot),
+            '-' => Ok(Token::Minus),
+            '+' => Ok(Token::Plus),
+            ';' => Ok(Token::Semicolon),
+            '*' => Ok(Token::Star),
             _ => Err(ScanError {
                 line: self.line,
                 message: format!("Unexpected character '{}'.", c),
@@ -96,7 +96,7 @@ impl Scanner {
             match self.scan_token() {
                 Ok(token) => {
                     tokens.push(token);
-                    if *tokens.last().unwrap() == Token::EOF {
+                    if *tokens.last().unwrap() == Token::Eof {
                         break;
                     }
                 }
@@ -104,7 +104,7 @@ impl Scanner {
             }
         }
 
-        if errors.len() > 0 {
+        if !errors.is_empty() {
             Err(errors)
         } else {
             Ok(tokens)
