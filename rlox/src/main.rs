@@ -79,12 +79,12 @@ impl Scanner {
         self.lex_curr_pos < self.source.len()
     }
 
-    fn peek_char(&self) -> u8 {
+    fn peek_next(&self) -> u8 {
         assert!(self.can_scan());
         self.source.as_bytes()[self.lex_curr_pos]
     }
 
-    fn next_char(&mut self) -> u8 {
+    fn scan_next(&mut self) -> u8 {
         assert!(self.can_scan());
 
         let c = self.source.as_bytes()[self.lex_curr_pos];
@@ -92,12 +92,12 @@ impl Scanner {
         c
     }
 
-    fn lookahead_one(&mut self, val: u8, eq: Token, fallback: Token) -> Token {
+    fn scan_next_if(&mut self, val: u8, eq: Token, fallback: Token) -> Token {
         if !self.can_scan() {
             return fallback;
         }
 
-        let c = self.source.as_bytes()[self.lex_curr_pos];
+        let c = self.peek_next();
         if c == val {
             self.lex_curr_pos += 1;
             eq
@@ -106,11 +106,11 @@ impl Scanner {
         }
     }
 
-    fn scan_token(&mut self) -> Result<Token, ScanError> {
+    fn emit_next(&mut self) -> Result<Token, ScanError> {
         use Token::*;
         assert!(self.can_scan());
 
-        let c = self.next_char();
+        let c = self.scan_next();
         // TODO: implement an alternative matcher using a trie, keep this implementation
         // put all these methods under a trait, and this current approach can be one
         // such trait implementation.
@@ -128,16 +128,16 @@ impl Scanner {
             b'*' => Ok(Star),
 
             // op tokens
-            b'!' => Ok(self.lookahead_one(b'=', BangEqual, Bang)),
-            b'=' => Ok(self.lookahead_one(b'=', EqualEqual, Equal)),
-            b'<' => Ok(self.lookahead_one(b'=', LessEqual, Less)),
-            b'>' => Ok(self.lookahead_one(b'=', GreaterEqual, Greater)),
+            b'!' => Ok(self.scan_next_if(b'=', BangEqual, Bang)),
+            b'=' => Ok(self.scan_next_if(b'=', EqualEqual, Equal)),
+            b'<' => Ok(self.scan_next_if(b'=', LessEqual, Less)),
+            b'>' => Ok(self.scan_next_if(b'=', GreaterEqual, Greater)),
             b'/' => Ok({
-                if !self.can_scan() || self.peek_char() != b'/' {
+                if !self.can_scan() || self.peek_next() != b'/' {
                     Slash
                 } else {
-                    while self.can_scan() && self.peek_char() != b'\n' {
-                        let _ = self.next_char();
+                    while self.can_scan() && self.peek_next() != b'\n' {
+                        let _ = self.scan_next();
                     }
                     SlashSlash
                 }
@@ -153,7 +153,7 @@ impl Scanner {
             b'"' => {
                 let mut literal = Vec::<u8>::new();
                 while self.can_scan() {
-                    let nc = self.next_char();
+                    let nc = self.scan_next();
                     literal.push(nc);
 
                     if nc == b'\n' {
@@ -182,7 +182,7 @@ impl Scanner {
                 let mut literal = vec![c];
                 let mut seen_dot = false;
                 while self.can_scan() {
-                    let nc = self.peek_char();
+                    let nc = self.peek_next();
 
                     if !nc.is_ascii_digit() && nc != b'.' {
                         break;
@@ -195,7 +195,7 @@ impl Scanner {
                         seen_dot = true;
                     }
 
-                    let _ = self.next_char();
+                    let _ = self.scan_next();
                     literal.push(nc);
                 }
 
@@ -205,12 +205,12 @@ impl Scanner {
             c if (c.is_ascii_alphanumeric() || c == b'_') => Ok({
                 let mut identifier = vec![c];
                 while self.can_scan() {
-                    let nc = self.peek_char();
+                    let nc = self.peek_next();
                     if !nc.is_ascii_alphanumeric() && nc != b'_' {
                         break;
                     }
 
-                    let _ = self.next_char();
+                    let _ = self.scan_next();
                     identifier.push(nc);
                 }
 
@@ -242,13 +242,13 @@ impl Scanner {
         }
     }
 
-    fn scan_tokens(&mut self) -> Result<Vec<Token>, Vec<ScanError>> {
+    fn emit_all(&mut self) -> Result<Vec<Token>, Vec<ScanError>> {
         let mut tokens = Vec::<Token>::new();
         let mut errors = Vec::<ScanError>::new();
 
         while self.can_scan() {
             self.lex_start_pos = self.lex_curr_pos;
-            match self.scan_token() {
+            match self.emit_next() {
                 Ok(token) => {
                     tokens.push(token);
 
@@ -279,7 +279,7 @@ fn interpret(code: String) {
         lex_start_pos: 0,
     };
 
-    match scanner.scan_tokens() {
+    match scanner.emit_all() {
         Ok(tokens) => {
             for token in tokens {
                 println!("{:#?}", token);
