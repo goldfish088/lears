@@ -1,0 +1,5 @@
+// this is a comment
+
+var test = "hello
+this is a multiline
+string...!";

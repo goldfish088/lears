@@ -153,19 +153,35 @@ impl Scanner {
             }),
 
             // string literals
-            // TODO: unterminated string literal issue
-            b'"' => Ok({
+            // TODO: multiline does not work in REPL mode
+            b'"' => {
                 let mut literal = Vec::<u8>::new();
                 while self.can_scan() {
                     let nc = self.next_char();
-                    if nc == b'"' {
+                    literal.push(nc);
+
+                    if nc == b'\n' {
+                        self.line += 1;
+                    } else if nc == b'"' {
                         break;
                     }
-                    literal.push(nc);
                 }
 
-                LiteralString(String::from_utf8(literal).unwrap())
-            }),
+                if literal.is_empty() || *literal.last().unwrap() != b'"' {
+                    Err(ScanError {
+                        line: self.line,
+                        message: format!(
+                            "Unterminated string literal between columns {}-{}: \"{}.",
+                            self.lex_start_pos,
+                            self.lex_curr_pos,
+                            str::from_utf8(&literal).unwrap()
+                        ),
+                    })
+                } else {
+                    let _ = literal.pop();
+                    Ok(LiteralString(String::from_utf8(literal).unwrap()))
+                }
+            }
 
             // number literals
             b'0'..=b'9' => Ok({
@@ -286,7 +302,6 @@ fn run_file(path: &String) {
         String::new()
     });
 
-    print_type(&code);
     interpret(code);
 }
 
