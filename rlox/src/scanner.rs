@@ -56,15 +56,6 @@ pub struct Scanner<'a> {
     lex_curr_pos: usize,
 }
 
-pub fn init_scanner<'a>(code: &'a str) -> Scanner<'a> {
-    Scanner {
-        source: code,
-        line: 1,
-        lex_curr_pos: 0,
-        lex_start_pos: 0,
-    }
-}
-
 pub struct ScanError {
     line: usize,
     message: String,
@@ -77,6 +68,15 @@ impl ScanError {
 }
 
 impl<'a> Scanner<'a> {
+    pub fn new(code: &'a str) -> Self {
+        Scanner {
+            source: code,
+            line: 1,
+            lex_curr_pos: 0,
+            lex_start_pos: 0,
+        }
+    }
+
     fn can_scan(&self) -> bool {
         self.lex_curr_pos < self.source.len()
     }

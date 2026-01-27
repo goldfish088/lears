@@ -11,7 +11,7 @@ fn print_type<T>(_: &T) {
 }
 
 fn interpret(code: &str) {
-    let mut scanner = scanner::init_scanner(code);
+    let mut scanner = scanner::Scanner::new(code);
 
     match scanner.emit_all() {
         Ok(tokens) => {
