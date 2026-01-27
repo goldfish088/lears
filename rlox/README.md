@@ -17,4 +17,6 @@ Guided by Parts I and III of [Crafting Interpreters](https://craftinginterpreter
 - https://doc.rust-lang.org/book/ch20-01-unsafe-rust.html
 - https://doc.rust-lang.org/nomicon/vec/vec.html
 
+### YouTube
+- https://www.youtube.com/watch?v=zfb1y8yn8QI
 
