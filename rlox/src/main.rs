@@ -59,37 +59,37 @@ fn run_repl() {
     }
 }
 
-use std::fmt::{Display, Error, Formatter};
+// use std::fmt::{Display, Error, Formatter};
 
-struct Point {
-    x: u8,
-    y: u8,
-}
-impl Display for Point {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        write!(f, "(x={}, y={})", self.x, self.y)
-    }
-}
+// struct Point {
+//     x: u8,
+//     y: u8,
+// }
+// impl Display for Point {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+//         write!(f, "(x={}, y={})", self.x, self.y)
+//     }
+// }
 
 fn main() {
-    {
-        let mut points: Vec<Box<Point>> = Vec::new();
-        for i in 1..=5 {
-            points.push(Box::new(Point { x: i, y: i }));
-        }
+    // {
+    //     let mut points: Vec<Box<Point>> = Vec::new();
+    //     for i in 1..=5 {
+    //         points.push(Box::new(Point { x: i, y: i }));
+    //     }
 
-        println!("the points are: {}", points);
-        print_type(&points);
+    //     println!("the points are: {}", points);
+    //     print_type(&points);
 
-        let points_slice = &points;
-        print_type(&points_slice);
+    //     let points_slice = &points;
+    //     print_type(&points_slice);
 
-        println!("iterating over points...");
-        for i in 0..points.len() {
-            println!("point {i}: {}", points_slice[i]);
-        }
-    }
-    process::exit(25);
+    //     println!("iterating over points...");
+    //     for i in 0..points.len() {
+    //         println!("point {i}: {}", points_slice[i]);
+    //     }
+    // }
+    // process::exit(25);
 
     let num_args = env::args().len();
     if num_args > 2 {

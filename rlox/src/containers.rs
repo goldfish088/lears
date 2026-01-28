@@ -1,9 +1,9 @@
 use std::alloc::{Layout, alloc, dealloc, handle_alloc_error, realloc};
 use std::fmt::{Display, Error, Formatter};
 use std::mem;
-use std::ops::{Drop, Deref};
-use std::slice;
+use std::ops::{Deref, Drop};
 use std::ptr::NonNull;
+use std::slice;
 
 // A handwritten Vec impl minus Send/Sync traits equipped
 // https://doc.rust-lang.org/nomicon/vec/vec-layout.html
@@ -114,32 +114,30 @@ impl<T> Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         unsafe {
-            /* [BUG] TODO: understand why swapping as_ptr() for as_ref() resolves
-            the below issue with provenance:
+            /* Introducing provenance: a pointer is more than (just) a number...
+
+             tl;dr
+             - It is a contract on a known set of addresses (currently contigous) relative to an "Original Pointer"
+             returned from a memory allocation
+             - The contract permits only accesses within this set, and the access must match the permission "tag"
+             i.e., in order to do a read / write from / to a location
+
+             Provenance in this unsafe block rejects the use of NonNull::as_ptr aka ptr::as_ptr(), because
+             this function "shrinks" (think narrowing permissions when deriving a new capability) the provenance
+             to only access the first element of the backing array. Using this method results in the
+             following error (last logged 28/01/26).
 
              error: Undefined Behavior: trying to retag from <28666> for SharedReadOnly permission at alloc695[0x8],
              but that tag does not exist in the borrow stack for this location
                 --> src/containers.rs:117:13
                     |
-                117 |             slice::from_raw_parts(self.arr.as_ref(), self.len)
+                    |             slice::from_raw_parts(self.arr.as_ref(), self.len)
                     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this error occurs as part of retag at alloc695[0x0..0x28]
                     |
-                    = help: this indicates a potential bug in the program: it performed an invalid operation, but the Stacked Borrows rules it
-                    violated are still experimental
 
-                    = help: see https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md for further information
-                help: <28666> was created by a SharedReadOnly retag at offsets [0x0..0x8]
-                --> src/containers.rs:117:35
-                    |
-                117 |             slice::from_raw_parts(self.arr.as_ref(), self.len)
-                    |                                   ^^^^^^^^^^^^^^^^^
-                    = note: stack backtrace:
-                            0: <containers::Vec<std::boxed::Box<Point>> as std::ops::Deref>::deref
-                                at src/containers.rs:117:13: 117:63
-                            1: main
-                                at src/main.rs:88:21: 88:33
+             Instead, we want to expose read access to all elements via the slice, which is done via ptr::as_ptr
             */
-            slice::from_raw_parts(self.arr.as_ref(), self.len)
+            slice::from_raw_parts(self.arr.as_ptr().cast_const(), self.len)
         }
     }
 }

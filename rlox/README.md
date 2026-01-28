@@ -28,3 +28,7 @@ Guided by Parts I and III of [Crafting Interpreters](https://craftinginterpreter
 ### Why ZSTs exist
 - https://dev.to/hoonweedev/whats-the-use-of-zero-sized-types-in-rust-4e83
 
+### Provenance
+- https://www.ralfj.de/blog/2018/07/24/pointers-and-bytes.html
+- https://www.reddit.com/r/rust/comments/1hxjdvp/eli5_what_is_pointer_provenance_and_will_it/
+
