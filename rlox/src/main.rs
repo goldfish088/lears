@@ -59,36 +59,18 @@ fn run_repl() {
     }
 }
 
-// use std::fmt::{Display, Error, Formatter};
-
-// struct Point {
-//     x: u8,
-//     y: u8,
-// }
-// impl Display for Point {
-//     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-//         write!(f, "(x={}, y={})", self.x, self.y)
-//     }
-// }
-
 fn main() {
-    // {
-    //     let mut points: Vec<Box<Point>> = Vec::new();
-    //     for i in 1..=5 {
-    //         points.push(Box::new(Point { x: i, y: i }));
-    //     }
+    {
+        let mut chunk = Chunk::new("my first bytecode!");
+        chunk.push(0);
+        chunk.push(1);
+        util::print_type(&chunk);
 
-    //     println!("the points are: {}", points);
-    //     util::print_type(&points);
+        // TODO: incomplete impl Display for Chunk
+        // println!("chunk is: {}", chunk);
+    }
 
-    //     points[0].x = 25;
-
-    //     println!("iterating over points...");
-    //     for i in 0..points.len() {
-    //         println!("point {i}: {}", points[i]);
-    //     }
-    // }
-    // process::exit(25);
+    process::exit(25);
 
     let num_args = env::args().len();
     if num_args > 2 {

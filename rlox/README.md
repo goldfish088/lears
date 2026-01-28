@@ -15,7 +15,11 @@ Guided by Parts I and III of [Crafting Interpreters](https://craftinginterpreter
 ### Rust docs
 - https://doc.rust-lang.org/stable/std/ptr/struct.NonNull.html
 - https://doc.rust-lang.org/std/alloc
+- https://doc.rust-lang.org/std/convert/trait.TryFrom.html
+- https://doc.rust-lang.org/book/ch13-01-closures.html
 
+### Rust By Example
+- https://doc.rust-lang.org/rust-by-example/generics/new_types.html
 
 
 ### Roll your own `std::vec::Vec`
