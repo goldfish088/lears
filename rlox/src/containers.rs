@@ -1,7 +1,7 @@
 use std::alloc::{Layout, alloc, dealloc, handle_alloc_error, realloc};
 use std::fmt::{Display, Error, Formatter};
 use std::mem;
-use std::ops::{Deref, Drop};
+use std::ops::{Deref, DerefMut, Drop};
 use std::ptr::NonNull;
 use std::slice;
 
@@ -138,6 +138,21 @@ impl<T> Deref for Vec<T> {
              Instead, we want to expose read access to all elements via the slice, which is done via ptr::as_ptr
             */
             slice::from_raw_parts(self.arr.as_ptr().cast_const(), self.len)
+        }
+    }
+}
+
+impl<T> DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        unsafe {
+            /* TODO: understand why self.arr.as_mut() causes
+                error: Undefined Behavior: trying to retag from <58311> for Unique permission at alloc695[0x8],
+                but that tag does not exist in the borrow stack for this location
+                        |
+                        |             slice::from_raw_parts_mut(self.arr.as_mut(), self.len)
+                        |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this error occurs as part of retag at alloc695[0x0..0x28]
+            */
+            slice::from_raw_parts_mut(self.arr.as_ptr(), self.len)
         }
     }
 }

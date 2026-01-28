@@ -81,12 +81,11 @@ fn main() {
     //     println!("the points are: {}", points);
     //     print_type(&points);
 
-    //     let points_slice = &points;
-    //     print_type(&points_slice);
+    //     points[0].x = 25;
 
     //     println!("iterating over points...");
     //     for i in 0..points.len() {
-    //         println!("point {i}: {}", points_slice[i]);
+    //         println!("point {i}: {}", points[i]);
     //     }
     // }
     // process::exit(25);
