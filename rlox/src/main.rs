@@ -9,6 +9,9 @@ use crate::scanner::Scanner;
 mod containers;
 use crate::containers::Vec;
 
+mod chunk;
+use crate::chunk::Chunk;
+
 #[allow(dead_code)]
 fn print_type<T>(_: &T) {
     println!("&type = {}", std::any::type_name::<&T>());
