@@ -12,10 +12,7 @@ use crate::containers::Vec;
 mod chunk;
 use crate::chunk::Chunk;
 
-#[allow(dead_code)]
-fn print_type<T>(_: &T) {
-    println!("&type = {}", std::any::type_name::<&T>());
-}
+mod util;
 
 fn interpret(code: &str) {
     let mut scanner = Scanner::new(code);
@@ -82,7 +79,7 @@ fn main() {
     //     }
 
     //     println!("the points are: {}", points);
-    //     print_type(&points);
+    //     util::print_type(&points);
 
     //     points[0].x = 25;
 
