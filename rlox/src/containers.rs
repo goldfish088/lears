@@ -1,7 +1,8 @@
 use std::alloc::{Layout, alloc, dealloc, handle_alloc_error, realloc};
 use std::fmt::{Display, Error, Formatter};
 use std::mem;
-use std::ops::Drop;
+use std::ops::{Drop, Deref};
+use std::slice;
 use std::ptr::NonNull;
 
 // A handwritten Vec impl minus Send/Sync traits equipped
@@ -105,6 +106,40 @@ impl<T> Drop for Vec<T> {
         let layout = Layout::array::<T>(self.cap).unwrap();
         unsafe {
             dealloc(self.arr.as_ptr() as *mut u8, layout);
+        }
+    }
+}
+
+impl<T> Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        unsafe {
+            /* [BUG] TODO: understand why swapping as_ptr() for as_ref() resolves
+            the below issue with provenance:
+
+             error: Undefined Behavior: trying to retag from <28666> for SharedReadOnly permission at alloc695[0x8],
+             but that tag does not exist in the borrow stack for this location
+                --> src/containers.rs:117:13
+                    |
+                117 |             slice::from_raw_parts(self.arr.as_ref(), self.len)
+                    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this error occurs as part of retag at alloc695[0x0..0x28]
+                    |
+                    = help: this indicates a potential bug in the program: it performed an invalid operation, but the Stacked Borrows rules it
+                    violated are still experimental
+
+                    = help: see https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md for further information
+                help: <28666> was created by a SharedReadOnly retag at offsets [0x0..0x8]
+                --> src/containers.rs:117:35
+                    |
+                117 |             slice::from_raw_parts(self.arr.as_ref(), self.len)
+                    |                                   ^^^^^^^^^^^^^^^^^
+                    = note: stack backtrace:
+                            0: <containers::Vec<std::boxed::Box<Point>> as std::ops::Deref>::deref
+                                at src/containers.rs:117:13: 117:63
+                            1: main
+                                at src/main.rs:88:21: 88:33
+            */
+            slice::from_raw_parts(self.arr.as_ref(), self.len)
         }
     }
 }
