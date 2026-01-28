@@ -2,7 +2,7 @@ Welcome to rlox, a rust implementation of the lox interpreter that executes tran
 
 Guided by Parts I and III of [Crafting Interpreters](https://craftinginterpreters.com).
 
-# References
+# Other References
 
 ### Rust book
 - https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html
@@ -12,6 +12,11 @@ Guided by Parts I and III of [Crafting Interpreters](https://craftinginterpreter
 - https://doc.rust-lang.org/book/ch15-01-box.html
 - https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html
 
+### Rust docs
+- https://doc.rust-lang.org/stable/std/ptr/struct.NonNull.html
+- https://doc.rust-lang.org/std/alloc
+
+
 
 ### Roll your own `std::vec::Vec`
 - https://doc.rust-lang.org/book/ch20-01-unsafe-rust.html
@@ -19,4 +24,7 @@ Guided by Parts I and III of [Crafting Interpreters](https://craftinginterpreter
 
 ### YouTube
 - https://www.youtube.com/watch?v=zfb1y8yn8QI
+
+### Why ZSTs exist
+- https://dev.to/hoonweedev/whats-the-use-of-zero-sized-types-in-rust-4e83
 

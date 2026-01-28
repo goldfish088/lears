@@ -4,6 +4,10 @@ use std::io::{self, Write};
 use std::process;
 
 mod scanner;
+use crate::scanner::Scanner;
+
+mod containers;
+use crate::containers::Vec;
 
 #[allow(dead_code)]
 fn print_type<T>(_: &T) {
@@ -11,7 +15,7 @@ fn print_type<T>(_: &T) {
 }
 
 fn interpret(code: &str) {
-    let mut scanner = scanner::Scanner::new(code);
+    let mut scanner = Scanner::new(code);
 
     match scanner.emit_all() {
         Ok(tokens) => {
@@ -55,7 +59,29 @@ fn run_repl() {
     }
 }
 
+// use std::fmt::{Display, Error, Formatter};
+
+// struct Point {
+//     x: u8,
+//     y: u8,
+// }
+// impl Display for Point {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+//         write!(f, "(x={}, y={})", self.x, self.y)
+//     }
+// }
+
 fn main() {
+    // {
+    //     let mut points: Vec<Box<Point>> = Vec::new();
+    //     for i in 1..=10 {
+    //         points.push(Box::new(Point { x: i, y: i }));
+    //     }
+
+    //     println!("the points are: {}", points);
+    // }
+    // process::exit(25);
+
     let num_args = env::args().len();
     if num_args > 2 {
         let fullpath = env::args().next().unwrap();
