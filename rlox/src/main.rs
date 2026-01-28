@@ -63,11 +63,11 @@ fn main() {
     {
         let mut chunk = Chunk::new("my first bytecode!");
         chunk.push(0);
-        chunk.push(1);
+        chunk.push(0);
         util::print_type(&chunk);
 
         // TODO: incomplete impl Display for Chunk
-        // println!("chunk is: {}", chunk);
+        println!("{}", chunk);
     }
 
     process::exit(25);
