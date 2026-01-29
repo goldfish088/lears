@@ -42,10 +42,9 @@ impl<'a> Chunk<'a> {
 
 type FnInstrFmtAndLength = fn(opcode: OpCode) -> (String, usize);
 
-// TODO: implement me with closures
 impl fmt::Display for Chunk<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        let Chunk { name, bytecode } = self;
+        let Chunk { name, bytecode, .. } = self;
 
         let simple_instruction: FnInstrFmtAndLength = |opcode| (format!("{}\n", opcode), 1);
 

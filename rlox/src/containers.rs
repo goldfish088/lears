@@ -103,6 +103,10 @@ impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         while self.pop().is_some() {}
 
+        // NonNull::dangling() yields a pointer, albeit invalid.
+        // This avoids freeing a dangling pointer.
+        if (self.capacity == 0) { return; }
+
         let layout = Layout::array::<T>(self.cap).unwrap();
         unsafe {
             dealloc(self.arr.as_ptr() as *mut u8, layout);

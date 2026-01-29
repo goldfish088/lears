@@ -6,9 +6,6 @@ use std::process;
 mod scanner;
 use crate::scanner::Scanner;
 
-mod containers;
-use crate::containers::Vec;
-
 mod chunk;
 use crate::chunk::Chunk;
 
@@ -66,7 +63,6 @@ fn main() {
         chunk.push(0);
         util::print_type(&chunk);
 
-        // TODO: incomplete impl Display for Chunk
         println!("{}", chunk);
     }
 
