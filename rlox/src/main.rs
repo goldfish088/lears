@@ -82,12 +82,19 @@ fn rlox_main() {
 }
 
 fn main() {
-    // {
-    //     let mut chunk = Chunk::new("my first bytecode!");
-    //     // chunk.push(0); chunk.push(0);
-    //     util::print_type(&chunk);
+    use crate::chunk::OpCode::*;
+    {
+        let mut chunk = Chunk::new("my first bytecode!");
 
-    //     println!("{}", chunk);
-    // }
-    rlox_main();
+        for i in 1..=10 {
+            chunk.write_byte(Constant as u8, 123);
+            let const_lookup =
+                chunk.add_constant(f64::try_from(i).expect("should be ok") + 0.42) as u8;
+            chunk.write_byte(const_lookup, 123);
+        }
+
+        chunk.write_byte(Ret as u8, 124);
+        println!("{}", chunk);
+    }
+    // rlox_main();
 }

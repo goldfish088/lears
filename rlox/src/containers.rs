@@ -105,7 +105,9 @@ impl<T> Drop for Vec<T> {
 
         // NonNull::dangling() yields a pointer, albeit invalid.
         // This avoids freeing a dangling pointer.
-        if self.cap == 0 { return; }
+        if self.cap == 0 {
+            return;
+        }
 
         let layout = Layout::array::<T>(self.cap).unwrap();
         unsafe {
