@@ -9,6 +9,8 @@ use crate::scanner::Scanner;
 mod chunk;
 use crate::chunk::Chunk;
 
+mod containers;
+
 mod util;
 
 fn interpret(code: &str) {
@@ -56,18 +58,7 @@ fn run_repl() {
     }
 }
 
-fn main() {
-    {
-        let mut chunk = Chunk::new("my first bytecode!");
-        chunk.push(0);
-        chunk.push(0);
-        util::print_type(&chunk);
-
-        println!("{}", chunk);
-    }
-
-    process::exit(25);
-
+fn rlox_main() {
     let num_args = env::args().len();
     if num_args > 2 {
         let fullpath = env::args().next().unwrap();
@@ -88,4 +79,15 @@ fn main() {
     } else {
         run_repl();
     }
+}
+
+fn main() {
+    // {
+    //     let mut chunk = Chunk::new("my first bytecode!");
+    //     // chunk.push(0); chunk.push(0);
+    //     util::print_type(&chunk);
+
+    //     println!("{}", chunk);
+    // }
+    rlox_main();
 }

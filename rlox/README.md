@@ -17,6 +17,7 @@ Guided by Parts I and III of [Crafting Interpreters](https://craftinginterpreter
 - https://doc.rust-lang.org/std/alloc
 - https://doc.rust-lang.org/std/convert/trait.TryFrom.html
 - https://doc.rust-lang.org/book/ch13-01-closures.html
+- https://doc.rust-lang.org/stable/std/prelude/index.html
 
 ### Rust By Example
 - https://doc.rust-lang.org/rust-by-example/generics/new_types.html

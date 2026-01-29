@@ -2,6 +2,11 @@ use std::convert::TryFrom;
 use std::fmt;
 use std::ops::{Deref, DerefMut};
 
+// Not including types you intend to use
+// can cause great trouble if the names
+// conflict with anything from the prelude.
+use crate::containers::Vec;
+
 // Our instruction set
 
 #[derive(fmt::Debug)]
@@ -62,7 +67,6 @@ impl fmt::Display for Chunk<'_> {
                             write!(f, "{}", fmt_opcode)?;
                             length
                         }
-                        _ => unreachable!(),
                     }
                 }
                 Err(error) => {
