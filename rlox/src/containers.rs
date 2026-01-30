@@ -1,6 +1,8 @@
 use std::alloc::{Layout, alloc, dealloc, handle_alloc_error, realloc};
 use std::fmt::{Display, Error, Formatter};
+use std::iter::{DoubleEndedIterator, FromIterator, IntoIterator, Iterator};
 use std::mem;
+use std::mem::ManuallyDrop;
 use std::ops::{Deref, DerefMut, Drop};
 use std::ptr::NonNull;
 use std::slice;
@@ -8,7 +10,7 @@ use std::slice;
 // A handwritten Vec impl minus Send/Sync traits equipped
 // https://doc.rust-lang.org/nomicon/vec/vec-layout.html
 
-pub struct Vec<T> {
+pub struct List<T> {
     // Note that if we had used `*mut T` instead we would
     // be invariant over T.
     // This is the main reason behind using `NonNull<T>`
@@ -18,10 +20,10 @@ pub struct Vec<T> {
     len: usize,
 }
 
-impl<T> Vec<T> {
+impl<T> List<T> {
     pub fn new() -> Self {
         assert!(mem::size_of::<T>() != 0, "no support for ZSTs yet!");
-        Vec {
+        List {
             arr: NonNull::dangling(),
             cap: 0,
             len: 0,
@@ -99,7 +101,77 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
+pub struct ListIter<T> {
+    arr: NonNull<T>,
+    cap: usize,
+    start: *const T,
+    end: *const T,
+}
+
+impl<T> Iterator for ListIter<T> {
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.start == self.end {
+            None
+        } else {
+            unsafe {
+                let item = self.start.read();
+                self.start = self.start.add(1);
+                Some(item)
+            }
+        }
+    }
+}
+
+impl<T> DoubleEndedIterator for ListIter<T> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.end == self.start {
+            None
+        } else {
+            unsafe {
+                self.end = self.end.sub(1);
+                Some(self.end.read())
+            }
+        }
+    }
+}
+
+impl<T> FromIterator<T> for List<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut list = List::new();
+
+        for it in iter {
+            list.push(it);
+        }
+
+        list
+    }
+}
+
+impl<T> IntoIterator for List<T> {
+    type Item = T;
+    type IntoIter = ListIter<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let list = ManuallyDrop::new(self);
+        let arr = list.arr;
+        let cap = list.cap;
+        let len = list.len;
+
+        ListIter {
+            arr,
+            cap,
+            start: arr.as_ptr(),
+            end: if cap == 0 {
+                arr.as_ptr()
+            } else {
+                unsafe { arr.as_ptr().add(len) }
+            },
+        }
+    }
+}
+
+impl<T> Drop for List<T> {
     fn drop(&mut self) {
         while self.pop().is_some() {}
 
@@ -116,7 +188,7 @@ impl<T> Drop for Vec<T> {
     }
 }
 
-impl<T> Deref for Vec<T> {
+impl<T> Deref for List<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         unsafe {
@@ -148,7 +220,7 @@ impl<T> Deref for Vec<T> {
     }
 }
 
-impl<T> DerefMut for Vec<T> {
+impl<T> DerefMut for List<T> {
     fn deref_mut(&mut self) -> &mut [T] {
         unsafe {
             /* TODO: understand why self.arr.as_mut() causes
@@ -163,7 +235,7 @@ impl<T> DerefMut for Vec<T> {
     }
 }
 
-impl<T> Display for Vec<T>
+impl<T> Display for List<T>
 where
     T: Display,
 {

@@ -10,6 +10,7 @@ mod chunk;
 use crate::chunk::Chunk;
 
 mod containers;
+use crate::containers::List;
 
 mod util;
 
@@ -94,7 +95,7 @@ fn main() {
         }
 
         chunk.write_byte(Ret as u8, 124);
-        println!("{}", chunk);
+        println!("{}", &chunk);
     }
-    // rlox_main();
+    rlox_main();
 }

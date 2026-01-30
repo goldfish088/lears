@@ -5,7 +5,7 @@ use std::ops::{Deref, DerefMut};
 // Not including types you intend to use
 // can cause great trouble if the names
 // conflict with anything from the prelude.
-use crate::containers::Vec;
+use crate::containers::List;
 
 // Our instruction set
 
@@ -34,30 +34,38 @@ impl TryFrom<u8> for OpCode {
 }
 
 // TODO: add more constant types like string literals
-type Value = f64;
+pub type Value = f64;
 
 pub struct Chunk<'a> {
     name: &'a str,
-    bytecode: Vec<u8>,
-    constants: Vec<Value>,
+    bytecode: List<u8>,
+    constants: List<Value>,
     // TODO: change this to use run length encoding instead of storing the line for every
     // single byte
-    lines: Vec<usize>,
+    lines: List<usize>,
 }
 
 impl<'a> Chunk<'a> {
     pub fn new(name: &'a str) -> Self {
         Chunk {
             name,
-            bytecode: Vec::new(),
-            constants: Vec::new(),
-            lines: Vec::new(),
+            bytecode: List::new(),
+            constants: List::new(),
+            lines: List::new(),
         }
+    }
+
+    pub fn get_byte(&self, offset: usize) -> u8 {
+        self.bytecode[offset]
     }
 
     pub fn write_byte(&mut self, byte: u8, line: usize) {
         self.bytecode.push(byte);
         self.lines.push(line);
+    }
+
+    pub fn get_constant(&self, lookup: usize) -> Value {
+        self.constants[lookup]
     }
 
     pub fn add_constant(&mut self, value: Value) -> usize {

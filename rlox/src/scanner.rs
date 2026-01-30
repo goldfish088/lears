@@ -1,5 +1,7 @@
 // handwritten scanner/lexer for the lox syntax grammar
 
+use crate::containers::List;
+
 #[derive(Debug, PartialEq)]
 pub enum Token {
     LParen,
@@ -150,7 +152,7 @@ impl<'a> Scanner<'a> {
             // string literals
             // TODO: multiline does not work in REPL mode
             b'"' => {
-                let mut literal = Vec::<u8>::new();
+                let mut literal = List::<u8>::new();
                 while self.can_scan() {
                     let nc = self.scan_next();
                     literal.push(nc);
@@ -167,12 +169,14 @@ impl<'a> Scanner<'a> {
                         line: self.line,
                         message: format!(
                             "Unterminated string literal \"{}",
-                            String::from_utf8(literal).unwrap()
+                            str::from_utf8(&literal as &[u8]).unwrap()
                         ),
                     })
                 } else {
                     let _ = literal.pop();
-                    Ok(LiteralString(String::from_utf8(literal).unwrap()))
+                    Ok(LiteralString(
+                        str::from_utf8(&literal as &[u8]).unwrap().to_owned(),
+                    ))
                 }
             }
 
@@ -241,9 +245,9 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    pub fn emit_all(&mut self) -> Result<Vec<Token>, Vec<ScanError>> {
-        let mut tokens = Vec::<Token>::new();
-        let mut errors = Vec::<ScanError>::new();
+    pub fn emit_all(&mut self) -> Result<List<Token>, List<ScanError>> {
+        let mut tokens = List::<Token>::new();
+        let mut errors = List::<ScanError>::new();
 
         while self.can_scan() {
             self.lex_start_pos = self.lex_curr_pos;
