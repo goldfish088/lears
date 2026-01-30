@@ -1,6 +1,5 @@
 use std::convert::TryFrom;
 use std::fmt;
-use std::ops::{Deref, DerefMut};
 
 // Not including types you intend to use
 // can cause great trouble if the names
@@ -118,19 +117,3 @@ impl fmt::Display for Chunk<'_> {
         Ok(())
     }
 }
-
-// Forward Vec<T> methods to Chunk
-
-// impl Deref for Chunk<'_> {
-//     type Target = Vec<u8>;
-
-//     fn deref(&self) -> &Self::Target {
-//         &self.bytecode
-//     }
-// }
-
-// impl DerefMut for Chunk<'_> {
-//     fn deref_mut(&mut self) -> &mut Self::Target {
-//         &mut self.bytecode
-//     }
-// }

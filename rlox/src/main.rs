@@ -10,7 +10,6 @@ mod chunk;
 use crate::chunk::Chunk;
 
 mod containers;
-use crate::containers::List;
 
 mod util;
 
