@@ -1,6 +1,6 @@
 // handwritten scanner/lexer for the lox syntax grammar
 
-use crate::containers::List;
+use crate::list::List;
 
 #[derive(Debug, PartialEq)]
 pub enum Token {

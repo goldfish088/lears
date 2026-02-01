@@ -4,7 +4,7 @@ use std::fmt;
 // Not including types you intend to use
 // can cause great trouble if the names
 // conflict with anything from the prelude.
-use crate::containers::List;
+use crate::list::List;
 
 // Our instruction set
 
