@@ -1,4 +1,50 @@
-use std::fmt::{Display, Error, Formatter};
+use std::fmt::{Debug, Display, Error, Formatter};
+
+#[derive(Debug, PartialEq)]
+pub enum Token {
+    LParen,
+    RParen,
+    LBrace,
+    RBrace,
+    Comma,
+    Eof,
+    Dot,
+    Minus,
+    Semicolon,
+    Plus,
+    Star,
+    Bang,
+    BangEqual,
+    Equal,
+    EqualEqual,
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
+    Slash,
+    SlashSlash,
+
+    LiteralString(String),
+    LiteralNumber(f64),
+
+    KeywordAnd,
+    KeywordClass,
+    KeywordElse,
+    KeywordFalse,
+    KeywordFun,
+    KeywordFor,
+    KeywordIf,
+    KeywordNil,
+    KeywordOr,
+    KeywordPrint,
+    KeywordReturn,
+    KeywordSuper,
+    KeywordThis,
+    KeywordTrue,
+    KeywordVar,
+    KeywordWhile,
+    Identifier(String),
+}
 
 // TODO: add more constant types like string literals
 pub type Value = f64;

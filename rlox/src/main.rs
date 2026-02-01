@@ -15,23 +15,22 @@ use crate::chunk::Chunk;
 mod list;
 
 mod common;
-use crate::common::Value;
+use crate::common::Token;
 
 mod util;
 
 fn interpret(code: String) {
     let mut scanner = Scanner::new(code);
 
-    match scanner.emit_all() {
-        Ok(tokens) => {
-            for token in tokens {
+    loop {
+        match scanner.emit_next() {
+            Ok(token) => {
                 println!("{:#?}", token);
+                if token == Token::Eof {
+                    break;
+                }
             }
-        }
-        Err(errors) => {
-            for error in errors {
-                error.report();
-            }
+            Err(err) => err.report(),
         }
     }
 }
@@ -131,6 +130,6 @@ fn debug_main() {
 }
 
 fn main() {
-    debug_main();
-    // rlox_main();
+    // debug_main();
+    rlox_main();
 }

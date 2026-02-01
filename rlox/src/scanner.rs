@@ -2,52 +2,7 @@
 
 use crate::list::List;
 
-#[derive(Debug, PartialEq)]
-pub enum Token {
-    LParen,
-    RParen,
-    LBrace,
-    RBrace,
-    Comma,
-    Eof,
-    Dot,
-    Minus,
-    Semicolon,
-    Plus,
-    Star,
-    Bang,
-    BangEqual,
-    Equal,
-    EqualEqual,
-    Less,
-    LessEqual,
-    Greater,
-    GreaterEqual,
-    Slash,
-    SlashSlash,
-    Whitespace,
-
-    LiteralString(String),
-    LiteralNumber(f64),
-
-    KeywordAnd,
-    KeywordClass,
-    KeywordElse,
-    KeywordFalse,
-    KeywordFun,
-    KeywordFor,
-    KeywordIf,
-    KeywordNil,
-    KeywordOr,
-    KeywordPrint,
-    KeywordReturn,
-    KeywordSuper,
-    KeywordThis,
-    KeywordTrue,
-    KeywordVar,
-    KeywordWhile,
-    Identifier(String),
-}
+use crate::common::Token;
 
 #[derive(Debug)]
 pub struct Scanner {
@@ -110,9 +65,34 @@ impl Scanner {
         }
     }
 
-    fn emit_next(&mut self) -> Result<Token, ScanError> {
+    fn skip_whitespace(&mut self) {
+        if !self.can_scan() {
+            return;
+        }
+        let mut advance = true;
+        while advance {
+            let c = self.peek_next();
+            advance = match c {
+                b' ' | b'\t' | b'\r' | b'\n' => {
+                    self.scan_next();
+
+                    if c == b'\n' {
+                        self.line += 1;
+                    }
+
+                    self.can_scan()
+                }
+                _ => false,
+            };
+        }
+    }
+
+    pub fn emit_next(&mut self) -> Result<Token, ScanError> {
         use Token::*;
-        assert!(self.can_scan());
+        self.skip_whitespace();
+        if !self.can_scan() {
+            return Ok(Eof);
+        }
 
         let c = self.scan_next();
         match c {
@@ -142,11 +122,6 @@ impl Scanner {
                     }
                     SlashSlash
                 }
-            }),
-            b' ' | b'\t' | b'\r' => Ok(Whitespace),
-            b'\n' => Ok({
-                self.line += 1;
-                Whitespace
             }),
 
             // string literals
@@ -242,34 +217,6 @@ impl Scanner {
                 line: self.line,
                 message: format!("Unexpected character '{}'", char::from(c)),
             }),
-        }
-    }
-
-    pub fn emit_all(&mut self) -> Result<List<Token>, List<ScanError>> {
-        let mut tokens = List::<Token>::new();
-        let mut errors = List::<ScanError>::new();
-
-        while self.can_scan() {
-            self.lex_start_pos = self.lex_curr_pos;
-            match self.emit_next() {
-                Ok(token) => {
-                    tokens.push(token);
-
-                    if !self.can_scan() {
-                        tokens.push(Token::Eof);
-                    }
-                }
-                Err(error) => errors.push(error),
-            }
-        }
-
-        if !errors.is_empty() {
-            Err(errors)
-        } else {
-            Ok(tokens
-                .into_iter()
-                .filter(|x| *x != Token::Whitespace)
-                .collect())
         }
     }
 }
