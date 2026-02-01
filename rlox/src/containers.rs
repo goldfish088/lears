@@ -171,6 +171,21 @@ impl<T> IntoIterator for List<T> {
     }
 }
 
+impl<T> Drop for ListIter<T> {
+    fn drop(&mut self) {
+        if self.cap > 0 {
+            // Free the allocation of each element (if of type: impl Drop)
+            for _ in &mut *self {}
+
+            // Free the container array allocation
+            let layout = Layout::array::<T>(self.cap).expect("Should always succeed");
+            unsafe {
+                dealloc(self.arr.as_ptr() as *mut u8, layout);
+            }
+        }
+    }
+}
+
 impl<T> Drop for List<T> {
     fn drop(&mut self) {
         while self.pop().is_some() {}
