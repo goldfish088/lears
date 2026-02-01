@@ -120,7 +120,6 @@ fn debug_main() {
         chunk.write_byte(Negate as u8, 123);
     }
 
-
     chunk.write_byte(Ret as u8, 123);
     println!("{}", &chunk);
 

@@ -20,7 +20,12 @@ impl VM {
         VM { stack: List::new() }
     }
 
-    fn interpret_binary_op(&mut self, chunk: &mut Chunk<Value>, ip: usize, binop: fn (Value, Value) -> Value) -> Result<(), ()> {
+    fn interpret_binary_op(
+        &mut self,
+        chunk: &mut Chunk<Value>,
+        ip: usize,
+        binop: fn(Value, Value) -> Value,
+    ) -> Result<(), ()> {
         if self.stack.len() < 2 {
             Err(())
         } else {
@@ -66,27 +71,27 @@ impl VM {
                         }
                     }
                     1
-                },
+                }
                 Ok(Add) => {
-                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| { v1 + v2 }) {
+                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| v1 + v2) {
                         return Err(InterpretError::Runtime);
                     }
                     1
-                },
+                }
                 Ok(Subtract) => {
-                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| { v1 - v2 }) {
+                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| v1 - v2) {
                         return Err(InterpretError::Runtime);
                     }
                     1
                 }
                 Ok(Multiply) => {
-                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| { v1 * v2 }) {
+                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| v1 * v2) {
                         return Err(InterpretError::Runtime);
                     }
                     1
                 }
                 Ok(Divide) => {
-                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| { v1 / v2 }) {
+                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| v1 / v2) {
                         return Err(InterpretError::Runtime);
                     }
                     1
