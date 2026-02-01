@@ -20,7 +20,7 @@ impl VM {
         VM { stack: List::new() }
     }
 
-    pub fn interpret(&mut self, chunk: Chunk<Value>) -> Result<(), InterpretError> {
+    pub fn interpret(&mut self, chunk: &mut Chunk<Value>) -> Result<(), InterpretError> {
         use OpCode::*;
         let mut ip = 0;
 
@@ -28,8 +28,9 @@ impl VM {
             let step = match OpCode::try_from(chunk.get_byte(ip)) {
                 Err(_) => return Err(InterpretError::Runtime),
                 Ok(Ret) => {
-                    self.stack.pop();
-                    println!("{}", Ret);
+                    if let Some(chunk_idx) = self.stack.pop() {
+                        println!("{}", chunk.get_constant(chunk_idx));
+                    }
                     return Ok(());
                 }
                 Ok(Constant) => {
@@ -39,6 +40,16 @@ impl VM {
                     println!("{}", &value);
                     self.stack.push(lookup as usize);
                     2
+                }
+                Ok(Negate) => {
+                    match self.stack.last() {
+                        None => return Err(InterpretError::Runtime),
+                        Some(chunk_idx) => {
+                            let constant = *chunk.get_constant(*chunk_idx);
+                            chunk.update_constant(*chunk_idx, -constant);
+                        }
+                    }
+                    1
                 }
             };
 

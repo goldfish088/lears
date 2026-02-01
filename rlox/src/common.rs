@@ -9,6 +9,7 @@ pub type Value = f64;
 pub enum OpCode {
     Ret,
     Constant,
+    Negate,
 }
 
 impl Display for OpCode {
@@ -24,6 +25,7 @@ impl TryFrom<u8> for OpCode {
         match value {
             0 => Ok(Ret),
             1 => Ok(Constant),
+            2 => Ok(Negate),
             _ => Err("Invalid opcode"),
         }
     }

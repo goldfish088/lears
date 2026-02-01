@@ -39,6 +39,10 @@ impl<V: Display> Chunk<V> {
         &self.constants[lookup]
     }
 
+    pub fn update_constant(&mut self, lookup: usize, replacement: V) {
+        self.constants[lookup] = replacement;
+    }
+
     pub fn add_constant(&mut self, value: V) -> usize {
         self.constants.push(value);
         self.constants.len() - 1
@@ -76,6 +80,10 @@ impl<V: Display> Display for Chunk<V> {
                             let lookup = bytecode[offset + 1] as usize;
                             writeln!(f, "{:<16} {:4} '{}'", opcode, lookup, &constants[lookup])?;
                             2
+                        }
+                        Negate => {
+                            writeln!(f, "{}", opcode)?;
+                            1
                         }
                     }
                 }

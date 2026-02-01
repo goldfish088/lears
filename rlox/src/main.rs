@@ -15,7 +15,6 @@ use crate::chunk::Chunk;
 mod list;
 
 mod common;
-use crate::common::Value;
 
 mod util;
 
@@ -97,11 +96,13 @@ fn debug_main() {
         chunk.write_byte(const_lookup, 123);
     }
 
+    chunk.write_byte(Negate as u8, 123);
+
     chunk.write_byte(Ret as u8, 124);
-    // println!("{}", &chunk);
+    println!("{}", &chunk);
 
     let mut vm = VM::new();
-    match vm.interpret(chunk) {
+    match vm.interpret(&mut chunk) {
         Ok(_) => {}
         Err(err) => println!("{:?}", err),
     }
