@@ -81,20 +81,21 @@ fn rlox_main() {
     }
 }
 
-fn main() {
+fn debug_main() {
     use crate::chunk::OpCode::*;
-    {
-        let mut chunk = Chunk::new("my first bytecode!".to_owned());
+    let mut chunk = Chunk::new("my first bytecode!".to_owned());
 
-        for i in 1..=10 {
-            chunk.write_byte(Constant as u8, 123);
-            let const_lookup =
-                chunk.add_constant(f64::try_from(i).expect("should be ok") + 0.42) as u8;
-            chunk.write_byte(const_lookup, 123);
-        }
-
-        chunk.write_byte(Ret as u8, 124);
-        println!("{}", &chunk);
+    for i in 1..=10 {
+        chunk.write_byte(Constant as u8, 123);
+        let const_lookup = chunk.add_constant(f64::try_from(i).expect("should be ok") + 0.42) as u8;
+        chunk.write_byte(const_lookup, 123);
     }
+
+    chunk.write_byte(Ret as u8, 124);
+    println!("{}", &chunk);
+}
+
+fn main() {
+    // debug_main();
     rlox_main();
 }
