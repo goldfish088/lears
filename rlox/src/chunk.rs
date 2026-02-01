@@ -1,36 +1,11 @@
-use std::convert::TryFrom;
-use std::fmt::{Debug, Display, Error, Formatter};
+use std::fmt::{Display, Error, Formatter};
 
 // Not including types you intend to use
 // can cause great trouble if the names
 // conflict with anything from the prelude.
 use crate::list::List;
 
-// Our instruction set
-
-#[derive(Debug)]
-pub enum OpCode {
-    Ret,
-    Constant,
-}
-
-impl Display for OpCode {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl TryFrom<u8> for OpCode {
-    type Error = &'static str;
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
-        use OpCode::*;
-        match value {
-            0 => Ok(Ret),
-            1 => Ok(Constant),
-            _ => Err("Invalid opcode"),
-        }
-    }
-}
+use crate::common::{OpCode};
 
 pub struct Chunk<V: Display> {
     name: String,

@@ -1,9 +1,9 @@
-use crate::chunk::{Chunk, OpCode};
+use crate::chunk::Chunk;
 use std::fmt::{Display, Error, Formatter};
 
 use crate::list::List;
 
-use crate::common::Value;
+use crate::common::{Value, OpCode};
 
 pub struct VM {
     stack: List<usize>,

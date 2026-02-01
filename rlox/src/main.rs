@@ -88,7 +88,7 @@ fn rlox_main() {
 }
 
 fn debug_main() {
-    use crate::chunk::OpCode::*;
+    use crate::common::OpCode::*;
     let mut chunk = Chunk::new("my first bytecode!".to_owned());
 
     for i in 1..=10 {
