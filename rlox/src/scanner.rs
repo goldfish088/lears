@@ -50,8 +50,8 @@ pub enum Token {
 }
 
 #[derive(Debug)]
-pub struct Scanner<'a> {
-    source: &'a str,
+pub struct Scanner {
+    source: String,
 
     line: usize,
     lex_start_pos: usize,
@@ -69,8 +69,8 @@ impl ScanError {
     }
 }
 
-impl<'a> Scanner<'a> {
-    pub fn new(code: &'a str) -> Self {
+impl Scanner {
+    pub fn new(code: String) -> Self {
         Scanner {
             source: code,
             line: 1,

@@ -35,8 +35,8 @@ impl TryFrom<u8> for OpCode {
 // TODO: add more constant types like string literals
 pub type Value = f64;
 
-pub struct Chunk<'a> {
-    name: &'a str,
+pub struct Chunk {
+    name: String,
     bytecode: List<u8>,
     constants: List<Value>,
     // TODO: change this to use run length encoding instead of storing the line for every
@@ -44,8 +44,8 @@ pub struct Chunk<'a> {
     lines: List<usize>,
 }
 
-impl<'a> Chunk<'a> {
-    pub fn new(name: &'a str) -> Self {
+impl Chunk {
+    pub fn new(name: String) -> Self {
         Chunk {
             name,
             bytecode: List::new(),
@@ -72,7 +72,7 @@ impl<'a> Chunk<'a> {
         self.constants.len() - 1
     }
 }
-impl fmt::Display for Chunk<'_> {
+impl fmt::Display for Chunk {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         let Chunk {
             name,

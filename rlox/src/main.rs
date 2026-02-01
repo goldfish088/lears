@@ -13,7 +13,7 @@ mod list;
 
 mod util;
 
-fn interpret(code: &str) {
+fn interpret(code: String) {
     let mut scanner = Scanner::new(code);
 
     match scanner.emit_all() {
@@ -36,7 +36,7 @@ fn run_file(path: &String) {
         String::new()
     });
 
-    interpret(code.as_str());
+    interpret(code);
 }
 
 fn run_repl() {
@@ -54,7 +54,7 @@ fn run_repl() {
             break;
         }
 
-        interpret(line.as_str());
+        interpret(line);
     }
 }
 
@@ -84,7 +84,7 @@ fn rlox_main() {
 fn main() {
     use crate::chunk::OpCode::*;
     {
-        let mut chunk = Chunk::new("my first bytecode!");
+        let mut chunk = Chunk::new("my first bytecode!".to_owned());
 
         for i in 1..=10 {
             chunk.write_byte(Constant as u8, 123);
