@@ -5,7 +5,7 @@ use std::fmt::{Display, Error, Formatter};
 // conflict with anything from the prelude.
 use crate::list::List;
 
-use crate::common::{OpCode};
+use crate::common::OpCode;
 
 pub struct Chunk<V: Display> {
     name: String,

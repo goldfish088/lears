@@ -1,5 +1,4 @@
-use std::fmt::{Display, Formatter, Error};
-
+use std::fmt::{Display, Error, Formatter};
 
 // TODO: add more constant types like string literals
 pub type Value = f64;

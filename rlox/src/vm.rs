@@ -3,7 +3,7 @@ use std::fmt::{Display, Error, Formatter};
 
 use crate::list::List;
 
-use crate::common::{Value, OpCode};
+use crate::common::{OpCode, Value};
 
 pub struct VM {
     stack: List<usize>,
