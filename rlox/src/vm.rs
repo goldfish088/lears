@@ -20,6 +20,22 @@ impl VM {
         VM { stack: List::new() }
     }
 
+    fn interpret_binary_op(&mut self, chunk: &mut Chunk<Value>, ip: usize, binop: fn (Value, Value) -> Value) -> Result<(), ()> {
+        if self.stack.len() < 2 {
+            Err(())
+        } else {
+            let two_idx = self.stack.pop().unwrap();
+            let one_idx = self.stack.pop().unwrap();
+
+            let two = *chunk.get_constant(two_idx);
+            let one = *chunk.get_constant(one_idx);
+
+            let res_idx = chunk.add_constant(binop(one, two));
+            self.stack.push(res_idx);
+            Ok(())
+        }
+    }
+
     pub fn interpret(&mut self, chunk: &mut Chunk<Value>) -> Result<(), InterpretError> {
         use OpCode::*;
         let mut ip = 0;
@@ -48,6 +64,30 @@ impl VM {
                             let constant = *chunk.get_constant(*chunk_idx);
                             chunk.update_constant(*chunk_idx, -constant);
                         }
+                    }
+                    1
+                },
+                Ok(Add) => {
+                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| { v1 + v2 }) {
+                        return Err(InterpretError::Runtime);
+                    }
+                    1
+                },
+                Ok(Subtract) => {
+                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| { v1 - v2 }) {
+                        return Err(InterpretError::Runtime);
+                    }
+                    1
+                }
+                Ok(Multiply) => {
+                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| { v1 * v2 }) {
+                        return Err(InterpretError::Runtime);
+                    }
+                    1
+                }
+                Ok(Divide) => {
+                    if let Err(_) = self.interpret_binary_op(chunk, ip, |v1, v2| { v1 / v2 }) {
+                        return Err(InterpretError::Runtime);
                     }
                     1
                 }

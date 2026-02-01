@@ -15,6 +15,7 @@ use crate::chunk::Chunk;
 mod list;
 
 mod common;
+use crate::common::Value;
 
 mod util;
 
@@ -90,15 +91,37 @@ fn debug_main() {
     use crate::common::OpCode::*;
     let mut chunk = Chunk::new("my first bytecode!".to_owned());
 
-    for i in 1..=10 {
+    // for i in 1..=10 {
+    //     chunk.write_byte(Constant as u8, 123);
+    //     let const_lookup = chunk.add_constant(Value::try_from(i).expect("should be ok")) as u8;
+    //     chunk.write_byte(const_lookup, 123);
+    // }
+
+    // chunk.write_byte(Negate as u8, 123);
+
+    {
+        // testing add operation
+        let one = chunk.add_constant(2.2);
         chunk.write_byte(Constant as u8, 123);
-        let const_lookup = chunk.add_constant(f64::try_from(i).expect("should be ok") + 0.42) as u8;
-        chunk.write_byte(const_lookup, 123);
+        chunk.write_byte(one as u8, 123);
+
+        let mut two = chunk.add_constant(3.4);
+        chunk.write_byte(Constant as u8, 123);
+        chunk.write_byte(two as u8, 123);
+
+        chunk.write_byte(Add as u8, 123);
+
+        two = chunk.add_constant(5.6);
+        chunk.write_byte(Constant as u8, 123);
+        chunk.write_byte(two as u8, 123);
+
+        chunk.write_byte(Divide as u8, 123);
+
+        chunk.write_byte(Negate as u8, 123);
     }
 
-    chunk.write_byte(Negate as u8, 123);
 
-    chunk.write_byte(Ret as u8, 124);
+    chunk.write_byte(Ret as u8, 123);
     println!("{}", &chunk);
 
     let mut vm = VM::new();

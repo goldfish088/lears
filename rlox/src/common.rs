@@ -10,6 +10,10 @@ pub enum OpCode {
     Ret,
     Constant,
     Negate,
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
 }
 
 impl Display for OpCode {
@@ -26,6 +30,10 @@ impl TryFrom<u8> for OpCode {
             0 => Ok(Ret),
             1 => Ok(Constant),
             2 => Ok(Negate),
+            3 => Ok(Add),
+            4 => Ok(Subtract),
+            5 => Ok(Multiply),
+            6 => Ok(Divide),
             _ => Err("Invalid opcode"),
         }
     }

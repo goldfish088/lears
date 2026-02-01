@@ -72,7 +72,7 @@ impl<V: Display> Display for Chunk<V> {
                         write!(f, "{:4} ", lines[offset])?;
                     }
                     match opcode {
-                        Ret => {
+                        Ret | Negate | Add | Subtract | Multiply | Divide => {
                             writeln!(f, "{}", opcode)?;
                             1
                         }
@@ -80,10 +80,6 @@ impl<V: Display> Display for Chunk<V> {
                             let lookup = bytecode[offset + 1] as usize;
                             writeln!(f, "{:<16} {:4} '{}'", opcode, lookup, &constants[lookup])?;
                             2
-                        }
-                        Negate => {
-                            writeln!(f, "{}", opcode)?;
-                            1
                         }
                     }
                 }
