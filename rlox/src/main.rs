@@ -3,6 +3,9 @@ use std::fs;
 use std::io::{self, Write};
 use std::process;
 
+mod vm;
+use crate::vm::VM;
+
 mod scanner;
 use crate::scanner::Scanner;
 
@@ -10,6 +13,9 @@ mod chunk;
 use crate::chunk::Chunk;
 
 mod list;
+
+mod common;
+use crate::common::Value;
 
 mod util;
 
@@ -92,10 +98,16 @@ fn debug_main() {
     }
 
     chunk.write_byte(Ret as u8, 124);
-    println!("{}", &chunk);
+    // println!("{}", &chunk);
+
+    let mut vm = VM::new();
+    match vm.interpret(chunk) {
+        Ok(_) => {}
+        Err(err) => println!("{:?}", err),
+    }
 }
 
 fn main() {
-    // debug_main();
-    rlox_main();
+    debug_main();
+    // rlox_main();
 }

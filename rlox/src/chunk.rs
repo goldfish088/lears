@@ -1,5 +1,5 @@
 use std::convert::TryFrom;
-use std::fmt;
+use std::fmt::{Debug, Display, Error, Formatter};
 
 // Not including types you intend to use
 // can cause great trouble if the names
@@ -8,14 +8,14 @@ use crate::list::List;
 
 // Our instruction set
 
-#[derive(fmt::Debug)]
+#[derive(Debug)]
 pub enum OpCode {
     Ret,
     Constant,
 }
 
-impl fmt::Display for OpCode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+impl Display for OpCode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         write!(f, "{:?}", self)
     }
 }
@@ -32,19 +32,16 @@ impl TryFrom<u8> for OpCode {
     }
 }
 
-// TODO: add more constant types like string literals
-pub type Value = f64;
-
-pub struct Chunk {
+pub struct Chunk<V: Display> {
     name: String,
     bytecode: List<u8>,
-    constants: List<Value>,
+    constants: List<V>,
     // TODO: change this to use run length encoding instead of storing the line for every
     // single byte
     lines: List<usize>,
 }
 
-impl Chunk {
+impl<V: Display> Chunk<V> {
     pub fn new(name: String) -> Self {
         Chunk {
             name,
@@ -63,17 +60,17 @@ impl Chunk {
         self.lines.push(line);
     }
 
-    pub fn get_constant(&self, lookup: usize) -> Value {
-        self.constants[lookup]
+    pub fn get_constant(&self, lookup: usize) -> &V {
+        &self.constants[lookup]
     }
 
-    pub fn add_constant(&mut self, value: Value) -> usize {
+    pub fn add_constant(&mut self, value: V) -> usize {
         self.constants.push(value);
         self.constants.len() - 1
     }
 }
-impl fmt::Display for Chunk {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+impl<V: Display> Display for Chunk<V> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         let Chunk {
             name,
             bytecode,
@@ -102,7 +99,7 @@ impl fmt::Display for Chunk {
                         }
                         Constant => {
                             let lookup = bytecode[offset + 1] as usize;
-                            writeln!(f, "{:<16} {:4} '{}'", opcode, lookup, constants[lookup])?;
+                            writeln!(f, "{:<16} {:4} '{}'", opcode, lookup, &constants[lookup])?;
                             2
                         }
                     }
