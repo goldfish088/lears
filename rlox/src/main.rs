@@ -6,8 +6,10 @@ use std::process;
 mod vm;
 use crate::vm::VM;
 
+mod compiler;
+use crate::compiler::Compiler;
+
 mod scanner;
-use crate::scanner::Scanner;
 
 mod chunk;
 use crate::chunk::Chunk;
@@ -15,24 +17,20 @@ use crate::chunk::Chunk;
 mod list;
 
 mod common;
-use crate::common::Token;
+use crate::common::{InterpretError, Value};
 
 mod util;
 
-fn interpret(code: String) {
-    let mut scanner = Scanner::new(code);
+fn run(code: String) -> Result<(), InterpretError> {
+    let compiler = Compiler::new();
+    let mut chunk = Chunk::<Value>::new("chunk".to_owned());
 
-    loop {
-        match scanner.emit_next() {
-            Ok(token) => {
-                println!("{:#?}", token);
-                if token == Token::Eof {
-                    break;
-                }
-            }
-            Err(err) => err.report(),
-        }
+    if !compiler.compile(&mut chunk, code) {
+        return Err(InterpretError::Compile);
     }
+
+    let mut vm = VM::new();
+    vm.interpret(&mut chunk)
 }
 
 fn run_file(path: &String) {
@@ -41,7 +39,9 @@ fn run_file(path: &String) {
         String::new()
     });
 
-    interpret(code);
+    if let Err(err) = run(code) {
+        eprintln!("{:?}", err);
+    }
 }
 
 fn run_repl() {
@@ -59,7 +59,9 @@ fn run_repl() {
             break;
         }
 
-        interpret(line);
+        if let Err(err) = run(line) {
+            eprintln!("{:?}", err);
+        }
     }
 }
 

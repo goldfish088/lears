@@ -1,11 +1,13 @@
 use std::fmt::{Display, Error, Formatter};
 
+use crate::scanner::Scanner;
+
 // Not including types you intend to use
 // can cause great trouble if the names
 // conflict with anything from the prelude.
 use crate::list::List;
 
-use crate::common::OpCode;
+use crate::common::{OpCode, Token};
 
 pub struct Chunk<V: Display> {
     name: String,
@@ -48,6 +50,7 @@ impl<V: Display> Chunk<V> {
         self.constants.len() - 1
     }
 }
+
 impl<V: Display> Display for Chunk<V> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         let Chunk {

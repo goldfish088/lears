@@ -34,6 +34,10 @@ impl Scanner {
         }
     }
 
+    pub fn get_line_number(&self) -> usize {
+        self.line
+    }
+
     fn can_scan(&self) -> bool {
         self.lex_curr_pos < self.source.len()
     }
@@ -51,7 +55,7 @@ impl Scanner {
         c
     }
 
-    fn scan_next_if(&mut self, val: u8, eq: Token, fallback: Token) -> Token {
+    pub fn scan_next_if(&mut self, val: u8, eq: Token, fallback: Token) -> Token {
         if !self.can_scan() {
             return fallback;
         }

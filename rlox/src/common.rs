@@ -84,3 +84,9 @@ impl TryFrom<u8> for OpCode {
         }
     }
 }
+
+#[derive(Debug)]
+pub enum InterpretError {
+    Compile,
+    Runtime,
+}

@@ -3,16 +3,10 @@ use std::fmt::{Display, Error, Formatter};
 
 use crate::list::List;
 
-use crate::common::{OpCode, Value};
+use crate::common::{InterpretError, OpCode, Value};
 
 pub struct VM {
     stack: List<usize>,
-}
-
-#[derive(Debug)]
-pub enum InterpretError {
-    Compile,
-    Runtime,
 }
 
 impl VM {
