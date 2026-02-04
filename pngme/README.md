@@ -8,4 +8,12 @@ These are the following supported functionalities:
 - Print a list of PNG chunks that can be searched for messages
 
 # References
-- TODO: fill me as we go
+
+## Language Reference
+- https://doc.rust-lang.org/reference/items/traits.html#dyn-compatibility
+
+## Standard Library
+- https://doc.rust-lang.org/std/keyword.dyn.html
+
+## Rust by Example
+- https://doc.rust-lang.org/rust-by-example/trait/dyn.html
