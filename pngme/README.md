@@ -9,11 +9,17 @@ These are the following supported functionalities:
 
 # References
 
+## PNG specification
+- https://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html
+
 ## Language Reference
 - https://doc.rust-lang.org/reference/items/traits.html#dyn-compatibility
 
 ## Standard Library
 - https://doc.rust-lang.org/std/keyword.dyn.html
+- https://doc.rust-lang.org/std/convert/trait.TryFrom.html
+- https://doc.rust-lang.org/std/str/trait.FromStr.html
+- https://doc.rust-lang.org/std/cmp/trait.PartialEq.html#how-can-i-implement-partialeq
 
 ## Rust by Example
 - https://doc.rust-lang.org/rust-by-example/trait/dyn.html
