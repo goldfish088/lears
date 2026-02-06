@@ -76,9 +76,11 @@ fn main() {
             file.read_to_end(&mut contents)
                 .expect("Could not read from file");
 
-            let mut png = Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
+            let mut png =
+                Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
 
-            let chunk_type = ChunkType::from_str(chunk_type).expect("Could not unmarshall ChunkType");
+            let chunk_type =
+                ChunkType::from_str(chunk_type).expect("Could not unmarshall ChunkType");
             let chunk = Chunk::new(chunk_type, Vec::from(message.clone()));
             png.append_chunk(chunk);
         }
@@ -108,7 +110,8 @@ fn main() {
             file.read_to_end(&mut contents)
                 .expect("Could not read from file");
 
-            let mut png = Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
+            let mut png =
+                Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
             if let Ok(chunk) = png.remove_first_chunk(chunk_type) {
                 println!("Removed chunk: {}", chunk);
             } else {
