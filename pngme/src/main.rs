@@ -6,10 +6,124 @@ mod commands;
 mod png;
 
 use std::boxed::Box;
+use std::io::Read;
+use std::path::PathBuf;
+
+use clap::{Parser, Subcommand};
 
 pub type Error = Box<dyn std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
 
+/*
+
+pngme encode ./dice.png ruSt "This is a secret message!
+
+pngme decode ./dice.png ruSt
+
+pngme remove ./dice.png ruSt
+
+pngme print ./dice.png
+
+*/
+
+#[derive(Parser)]
+#[command(name = "pngme")]
+#[command(about = "A PNG chunk secret message encoder/decoder", long_about = None)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    Encode {
+        file_path: PathBuf,
+        chunk_type: String,
+        message: String,
+        output_file: Option<PathBuf>,
+    },
+    Decode {
+        file_path: PathBuf,
+        chunk_type: String,
+    },
+    Remove {
+        file_path: PathBuf,
+        chunk_type: String,
+    },
+    Print {
+        file_path: PathBuf,
+    },
+}
+
+use crate::chunk::Chunk;
+use crate::chunk_type::ChunkType;
+use crate::png::Png;
+use std::fs::File;
+use std::str::FromStr;
+
 fn main() {
-    println!("Hello, world!");
+    let cli = Cli::parse();
+
+    match &cli.command {
+        Commands::Encode {
+            file_path,
+            chunk_type,
+            message,
+            output_file,
+        } => {
+            let mut file = File::open(file_path).expect("File not found");
+            let mut contents = Vec::new();
+            file.read_to_end(&mut contents)
+                .expect("Could not read from file");
+
+            let mut png = Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
+
+            let chunk_type = ChunkType::from_str(chunk_type).expect("Could not unmarshall ChunkType");
+            let chunk = Chunk::new(chunk_type, Vec::from(message.clone()));
+            png.append_chunk(chunk);
+        }
+        Commands::Decode {
+            file_path,
+            chunk_type,
+        } => {
+            let mut file = File::open(file_path).expect("File not found");
+            let mut contents = Vec::new();
+            file.read_to_end(&mut contents)
+                .expect("Could not read from file");
+
+            let png = Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
+
+            if let Some(chunk) = png.chunk_by_type(chunk_type) {
+                println!("Found chunk: {}", chunk);
+            } else {
+                println!("Could not find such a chunk");
+            }
+        }
+        Commands::Remove {
+            file_path,
+            chunk_type,
+        } => {
+            let mut file = File::open(file_path).expect("File not found");
+            let mut contents = Vec::new();
+            file.read_to_end(&mut contents)
+                .expect("Could not read from file");
+
+            let mut png = Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
+            if let Ok(chunk) = png.remove_first_chunk(chunk_type) {
+                println!("Removed chunk: {}", chunk);
+            } else {
+                println!("Could not find such a chunk");
+            }
+        }
+        Commands::Print { file_path } => {
+            let mut file = File::open(file_path).expect("File not found");
+            let mut contents = Vec::new();
+            file.read_to_end(&mut contents)
+                .expect("Could not read from file");
+
+            let png = Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
+            println!("Marshalled PNG");
+            println!("{}", png);
+        }
+    }
 }

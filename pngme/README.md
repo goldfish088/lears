@@ -26,6 +26,7 @@ These are the following supported functionalities:
 - https://doc.rust-lang.org/std/str/trait.FromStr.html
 - https://doc.rust-lang.org/std/cmp/trait.PartialEq.html#how-can-i-implement-partialeq
 - https://doc.rust-lang.org/std/primitive.u32.html
+- https://doc.rust-lang.org/std/env/index.html
 
 ## Rust by Example
 - https://doc.rust-lang.org/rust-by-example/trait/dyn.html

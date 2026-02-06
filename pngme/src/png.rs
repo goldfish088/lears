@@ -31,11 +31,11 @@ impl Png {
         Png { chunks }
     }
 
-    fn append_chunk(&mut self, chunk: Chunk) {
+    pub fn append_chunk(&mut self, chunk: Chunk) {
         self.chunks.push(chunk);
     }
 
-    fn remove_first_chunk(&mut self, chunk_type: &str) -> crate::Result<Chunk> {
+    pub fn remove_first_chunk(&mut self, chunk_type: &str) -> crate::Result<Chunk> {
         let target_type = ChunkType::from_str(chunk_type)?;
 
         for (i, chunk) in self.chunks.iter().enumerate() {
@@ -60,7 +60,7 @@ impl Png {
         self.chunks.as_slice()
     }
 
-    fn chunk_by_type(&self, chunk_type: &str) -> Option<Chunk> {
+    pub fn chunk_by_type(&self, chunk_type: &str) -> Option<Chunk> {
         match ChunkType::from_str(chunk_type) {
             Err(_) => None,
             Ok(chunk_type) => {
