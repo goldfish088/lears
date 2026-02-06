@@ -3,7 +3,7 @@
 use std::fmt::{Debug, Display, Error, Formatter};
 use std::str::FromStr;
 
-struct ChunkType {
+pub struct ChunkType {
     raw_bytes: [u8; 4],
 }
 

@@ -1,3 +1,4 @@
+#[cfg(any(target_pointer_width = "32", target_pointer_width = "64"))]
 mod args;
 mod chunk;
 mod chunk_type;
