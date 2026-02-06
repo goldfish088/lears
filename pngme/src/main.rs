@@ -109,7 +109,7 @@ fn main() -> Result<()> {
         }
         Commands::Print { file_path } => {
             let png = open_png(file_path)?;
-            println!("Marshalled PNG");
+            println!("Unmarshalled PNG");
             println!("{}", png);
         }
     }

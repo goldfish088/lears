@@ -173,14 +173,15 @@ impl Display for Chunk {
         writeln!(f, "\tLength: {}", self.length)?;
         writeln!(f, "\tType: {}", self.chunk_type)?;
         write!(f, "\tData: [")?;
-        writeln!(f, "}}")?;
 
         for b in &self.data {
-            write!(f, " {:x}", b)?;
+            write!(f, " {:02x}", b)?;
         }
 
         writeln!(f, " ]")?;
-        write!(f, "CRC-32: 0x{:x}", self.crc)
+        writeln!(f, "\tCRC-32: 0x{:x}", self.crc)?;
+        write!(f, "}}")?;
+        Ok(())
     }
 }
 

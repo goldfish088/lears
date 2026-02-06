@@ -141,9 +141,9 @@ impl FromStr for Png {
 
 impl Display for Png {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        writeln!(f, "Header: [")?;
+        write!(f, "Header: [")?;
         for byte in self.header() {
-            write!(f, " {}", byte)?;
+            write!(f, " {:02x}", byte)?;
         }
 
         writeln!(f, " ]")?;
