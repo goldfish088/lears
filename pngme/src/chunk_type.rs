@@ -3,6 +3,7 @@
 use std::fmt::{Debug, Display, Error, Formatter};
 use std::str::FromStr;
 
+#[derive(Clone, Copy)]
 pub struct ChunkType {
     raw_bytes: [u8; 4],
 }
@@ -23,7 +24,7 @@ impl ChunkType {
         self.raw_bytes[2] & 0x20 == 0
     }
 
-    fn is_critical(&self) -> bool {
+    pub fn is_critical(&self) -> bool {
         self.raw_bytes[0] & 0x20 == 0
     }
 

@@ -11,11 +11,22 @@ use std::fmt::{self, Display, Formatter};
 
 use crate::chunk_type::ChunkType;
 
-struct Chunk {
+pub struct Chunk {
     length: u32,
     chunk_type: ChunkType,
     data: Box<[u8]>,
     crc: u32,
+}
+
+impl Clone for Chunk {
+    fn clone(&self) -> Self {
+        Self {
+            length: self.length,
+            chunk_type: self.chunk_type,
+            data: self.data.clone(),
+            crc: self.crc,
+        }
+    }
 }
 
 impl Chunk {
@@ -158,16 +169,18 @@ impl TryFrom<&[u8]> for Chunk {
 
 impl Display for Chunk {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        writeln!(f, "Length: {}", self.length)?;
-        writeln!(f, "Type: {}", self.chunk_type)?;
-        write!(f, "Data: [")?;
+        writeln!(f, "Chunk: {{")?;
+        writeln!(f, "\tLength: {}", self.length)?;
+        writeln!(f, "\tType: {}", self.chunk_type)?;
+        write!(f, "\tData: [")?;
+        writeln!(f, "}}")?;
 
         for b in &self.data {
             write!(f, " {:x}", b)?;
         }
 
-        writeln!(f, "]")?;
-        writeln!(f, "{:x}", self.crc)
+        writeln!(f, " ]")?;
+        write!(f, "CRC-32: 0x{:x}", self.crc)
     }
 }
 
