@@ -20,7 +20,7 @@ use std::str::FromStr;
 use crate::chunk::Chunk;
 use crate::chunk_type::ChunkType;
 
-struct Png {
+pub struct Png {
     chunks: Vec<Chunk>,
 }
 
@@ -36,11 +36,9 @@ impl Png {
     }
 
     fn remove_first_chunk(&mut self, chunk_type: &str) -> crate::Result<Chunk> {
-        let mut i: usize = 0;
-
         let target_type = ChunkType::from_str(chunk_type)?;
 
-        for chunk in &self.chunks {
+        for (i, chunk) in self.chunks.iter().enumerate() {
             let other_type = chunk.chunk_type();
             if *other_type == target_type {
                 // // if other_type.is_critical() {
@@ -49,8 +47,6 @@ impl Png {
                 return Ok(self.chunks.remove(i));
                 // }
             }
-
-            i += 1;
         }
 
         Err(format!("No such chunk of type {}", chunk_type).into())
@@ -96,11 +92,6 @@ impl Png {
 
         bytes
     }
-}
-
-enum ParseState {
-    Header,
-    Chunk,
 }
 
 impl TryFrom<&[u8]> for Png {

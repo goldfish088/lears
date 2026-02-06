@@ -108,12 +108,12 @@ impl Chunk {
 impl TryFrom<&[u8]> for Chunk {
     type Error = crate::Error;
     fn try_from(raw_bytes: &[u8]) -> Result<Self, Self::Error> {
-        let mut length = [0 as u8; 4];
+        let mut length = [0_u8; 4];
         let mut iter = raw_bytes.iter();
 
         // length
-        for i in 0..4 {
-            length[i] = *iter
+        for be_byte in &mut length {
+            *be_byte = *iter
                 .next()
                 .ok_or::<crate::Error>("Expected byte for length field".into())?;
         }
@@ -124,9 +124,9 @@ impl TryFrom<&[u8]> for Chunk {
         }
 
         // chunk type
-        let mut chunk_type = [0 as u8; 4];
-        for i in 0..4 {
-            chunk_type[i] = *iter
+        let mut chunk_type = [0_u8; 4];
+        for be_byte in &mut chunk_type {
+            *be_byte = *iter
                 .next()
                 .ok_or::<crate::Error>("Expected byte for chunk type field".into())?
         }
@@ -137,17 +137,17 @@ impl TryFrom<&[u8]> for Chunk {
             return Err("More bytes than expected when combining data and crc fields".into());
         }
 
-        let mut data = vec![0 as u8; length as usize];
+        let mut data = vec![0_u8; length as usize];
 
-        for i in 0..length {
-            data[i as usize] = *iter
+        for be_byte in &mut data {
+            *be_byte = *iter
                 .next()
                 .ok_or::<crate::Error>("Expected byte for chunk data field".into())?
         }
 
-        let mut crc = [0 as u8; 4];
-        for i in 0..4 {
-            crc[i] = *iter
+        let mut crc = [0_u8; 4];
+        for be_byte in &mut crc {
+            *be_byte = *iter
                 .next()
                 .ok_or::<crate::Error>("Expected byte for crc field".into())?
         }

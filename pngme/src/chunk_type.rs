@@ -14,7 +14,7 @@ impl ChunkType {
     }
 
     fn is_byte_valid(byte: u8) -> bool {
-        (b'a' <= byte && byte <= b'z') || (b'A' <= byte && byte <= b'Z')
+        byte.is_ascii_lowercase() || byte.is_ascii_uppercase()
     }
 
     fn is_valid(&self) -> bool {
@@ -57,14 +57,12 @@ impl TryFrom<[u8; 4]> for ChunkType {
     fn try_from(raw_bytes: [u8; 4]) -> Result<Self, Self::Error> {
         let mut bytes: [u8; 4] = [0, 0, 0, 0];
 
-        let mut pos = 0;
-        for byte in raw_bytes {
-            if !Self::is_byte_valid(byte) {
+        for (pos, byte) in raw_bytes.iter().enumerate() {
+            if !Self::is_byte_valid(*byte) {
                 return Err(format!("Invalid byte '{}' at position {}", byte, pos).into());
             }
 
-            bytes[pos] = byte;
-            pos += 1;
+            bytes[pos] = *byte;
         }
 
         Ok(ChunkType { raw_bytes: bytes })
@@ -79,14 +77,12 @@ impl FromStr for ChunkType {
         } else {
             let mut raw_bytes: [u8; 4] = [0, 0, 0, 0];
 
-            let mut pos = 0;
-            for byte in s.as_bytes() {
+            for (pos, byte) in s.as_bytes().iter().enumerate() {
                 if !Self::is_byte_valid(*byte) {
                     return Err(format!("Invalid byte '{}' at position {}", byte, pos).into());
                 }
 
                 raw_bytes[pos] = *byte;
-                pos += 1;
             }
 
             Ok(ChunkType { raw_bytes })
