@@ -59,9 +59,18 @@ use crate::chunk::Chunk;
 use crate::chunk_type::ChunkType;
 use crate::png::Png;
 use std::fs::File;
+use std::io;
 use std::str::FromStr;
 
-fn main() {
+fn open_png(file_path: &PathBuf) -> Result<Png> {
+    let mut file = File::open(file_path)?;
+    let mut contents = Vec::new();
+    file.read_to_end(&mut contents)?;
+
+    Png::try_from(contents.as_slice())
+}
+
+fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match &cli.command {
@@ -71,16 +80,8 @@ fn main() {
             message,
             output_file,
         } => {
-            let mut file = File::open(file_path).expect("File not found");
-            let mut contents = Vec::new();
-            file.read_to_end(&mut contents)
-                .expect("Could not read from file");
-
-            let mut png =
-                Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
-
-            let chunk_type =
-                ChunkType::from_str(chunk_type).expect("Could not unmarshall ChunkType");
+            let mut png = open_png(file_path)?;
+            let chunk_type = ChunkType::from_str(chunk_type)?;
             let chunk = Chunk::new(chunk_type, Vec::from(message.clone()));
             png.append_chunk(chunk);
         }
@@ -88,13 +89,7 @@ fn main() {
             file_path,
             chunk_type,
         } => {
-            let mut file = File::open(file_path).expect("File not found");
-            let mut contents = Vec::new();
-            file.read_to_end(&mut contents)
-                .expect("Could not read from file");
-
-            let png = Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
-
+            let png = open_png(file_path)?;
             if let Some(chunk) = png.chunk_by_type(chunk_type) {
                 println!("Found chunk: {}", chunk);
             } else {
@@ -105,13 +100,7 @@ fn main() {
             file_path,
             chunk_type,
         } => {
-            let mut file = File::open(file_path).expect("File not found");
-            let mut contents = Vec::new();
-            file.read_to_end(&mut contents)
-                .expect("Could not read from file");
-
-            let mut png =
-                Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
+            let mut png = open_png(file_path)?;
             if let Ok(chunk) = png.remove_first_chunk(chunk_type) {
                 println!("Removed chunk: {}", chunk);
             } else {
@@ -119,14 +108,11 @@ fn main() {
             }
         }
         Commands::Print { file_path } => {
-            let mut file = File::open(file_path).expect("File not found");
-            let mut contents = Vec::new();
-            file.read_to_end(&mut contents)
-                .expect("Could not read from file");
-
-            let png = Png::try_from(contents.as_slice()).expect("Could not unmarshall PNG file");
+            let png = open_png(file_path)?;
             println!("Marshalled PNG");
             println!("{}", png);
         }
     }
+
+    Ok(())
 }
