@@ -46,7 +46,7 @@ impl Png {
                 // // if other_type.is_critical() {
                 // //     return Err("Cannot remove critical chunk".into());
                 // // } else {
-                    return Ok(self.chunks.remove(i));
+                return Ok(self.chunks.remove(i));
                 // }
             }
 
@@ -111,7 +111,9 @@ impl TryFrom<&[u8]> for Png {
         let mut pos: usize = 0;
 
         {
-            let header = bytes[..8].first_chunk::<8>().ok_or::<Self::Error>("Expected 8 bytes of header for PNG".into())?;
+            let header = bytes[..8]
+                .first_chunk::<8>()
+                .ok_or::<Self::Error>("Expected 8 bytes of header for PNG".into())?;
             if *header != Self::STANDARD_HEADER {
                 return Err("Invalid header for PNG".into());
             }
@@ -133,7 +135,7 @@ impl TryFrom<&[u8]> for Png {
                 return Err("Not enough bytes to read chunk".into());
             }
 
-            chunks.push(Chunk::try_from(&bytes[pos..pos+chunk_size])?);
+            chunks.push(Chunk::try_from(&bytes[pos..pos + chunk_size])?);
             pos += chunk_size;
         }
     }
